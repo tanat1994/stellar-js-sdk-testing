@@ -1,7 +1,9 @@
 const StellarSDK = require('stellar-sdk');
+// @dev define horizon-testnet
 const server = new StellarSDK.Server('https://horizon-testnet.stellar.org');
 StellarSDK.Network.useTestNetwork();
 
+// @dev generate keypairs
 let pairA = StellarSDK.Keypair.random();
 let pairB = StellarSDK.Keypair.random();
 let accountA, accountB = null;
@@ -11,6 +13,7 @@ console.log("Public Key B : " + pairB.publicKey());
 console.log("Private Key B : " + pairB.secret());
 
 const request = require('request');
+// @dev get XLM from friendbot
 request.get({
   uri : 'https://horizon-testnet.stellar.org/friendbot',
   qs : { addr : pairA.publicKey() },
@@ -19,6 +22,7 @@ request.get({
     if(error || response.statusCode !== 200){
       console.error("Error : " ,error || body);
     } else {
+      // @dev success transfer from friendbot
       console.log("Success to transfer : " + body);
       server.loadAccount(pairA.publicKey())
       .then(function(account){
@@ -26,6 +30,8 @@ request.get({
         account.balances.forEach(function(balance) {
           console.log("Account A Type : " , balance.asset_type, " Balance : " , balance);
         });
+
+        // @dev generate transaction
         const transaction = new StellarSDK.TransactionBuilder(account)
           .addOperation(StellarSDK.Operation.payment({
             destination : 'GB6JHU34GXLRJDLBRSYD3D4EATHLUB4SVOPZ6KNYS6PEPPEO77425ELU',
